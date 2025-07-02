@@ -1,0 +1,56 @@
+site_name: Book Store Service
+site_description: A comprehensive book store management API built with FastAPI and SQLAlchemy
+site_author: Book Store Team
+site_url: https://yourusername.github.io/book_store_service_python_fastapi_sql/
+
+repo_name: yourusername/book_store_service_python_fastapi_sql
+repo_url: https://github.com/yourusername/book_store_service_python_fastapi_sql
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to light mode
+
+nav:
+  - Home: index.md
+  - API Documentation:
+    - Overview: api/overview.md
+    - Endpoints: api/endpoints.md
+    - Models: api/models.md
+  - Development:
+    - Setup: development/setup.md
+    - Testing: development/testing.md
+    - Deployment: development/deployment.md
+  - Examples:
+    - Quick Start: examples/quickstart.md
+    - Sample Requests: examples/requests.md
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [app]
+          options:
+            show_source: true
+            show_root_heading: true
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - toc:
+      permalink: true 

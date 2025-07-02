@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Store Service - FastAPI & SQLAlchemy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            margin: 2rem;
+        }
+        
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .feature {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .feature h3 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+        
+        .btn-secondary:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+        
+        .tech-stack {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .tech-stack h3 {
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+        
+        .tech-list {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .tech-item {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 2rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">📚</div>
+        <h1>Book Store Service</h1>
+        <p class="subtitle">A comprehensive book store management API built with FastAPI and SQLAlchemy</p>
+        
+        <div class="features">
+            <div class="feature">
+                <h3>🚀 FastAPI</h3>
+                <p>Modern, fast web framework for building APIs</p>
+            </div>
+            <div class="feature">
+                <h3>🗄️ SQLAlchemy</h3>
+                <p>Powerful ORM for database management</p>
+            </div>
+            <div class="feature">
+                <h3>📖 Auto Docs</h3>
+                <p>Interactive API documentation with Swagger UI</p>
+            </div>
+            <div class="feature">
+                <h3>🧪 Testing</h3>
+                <p>Comprehensive test suite with pytest</p>
+            </div>
+            <div class="feature">
+                <h3>🐳 Docker</h3>
+                <p>Containerized deployment ready</p>
+            </div>
+            <div class="feature">
+                <h3>🔍 Search</h3>
+                <p>Advanced search and filtering capabilities</p>
+            </div>
+        </div>
+        
+        <div class="tech-stack">
+            <h3>Tech Stack</h3>
+            <div class="tech-list">
+                <span class="tech-item">Python 3.8+</span>
+                <span class="tech-item">FastAPI</span>
+                <span class="tech-item">SQLAlchemy</span>
+                <span class="tech-item">Pydantic</span>
+                <span class="tech-item">PostgreSQL</span>
+                <span class="tech-item">Docker</span>
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <a href="https://github.com/yourusername/book_store_service_python_fastapi_sql" class="btn btn-primary">
+                📁 View on GitHub
+            </a>
+            <a href="https://yourusername.github.io/book_store_service_python_fastapi_sql/" class="btn btn-secondary">
+                📖 Documentation
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // Add some interactivity
+        document.addEventListener('DOMContentLoaded', function() {
+            const buttons = document.querySelectorAll('.btn');
+            
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+                
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Add a subtle animation to the logo
+            const logo = document.querySelector('.logo');
+            logo.style.animation = 'bounce 2s infinite';
+            
+            // Add CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes bounce {
+                    0%, 20%, 50%, 80%, 100% {
+                        transform: translateY(0);
+                    }
+                    40% {
+                        transform: translateY(-10px);
+                    }
+                    60% {
+                        transform: translateY(-5px);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html> 
