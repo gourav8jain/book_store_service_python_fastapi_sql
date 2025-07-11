@@ -1,25 +1,16 @@
-from fastapi import FastAPI, Depends, HTTPException, Query, status
+from fastapi import FastAPI, Query, HTTPException, Body
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
 from typing import List, Optional
 import math
 
-from . import crud, models, schemas
-from .database import engine, get_db
-
-# Create database tables
-models.Base.metadata.create_all(bind=engine)
-
-# Create FastAPI app
 app = FastAPI(
-    title="Book Store Service",
-    description="A comprehensive book store management API built with FastAPI and SQLAlchemy",
+    title="Book Store Service (Mock)",
+    description="A comprehensive book store management API (mock/in-memory mode)",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
 )
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -28,166 +19,206 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Root endpoint
+# In-memory mock data
+MOCK_AUTHORS = [
+    {"id": 1, "name": "Mock Author 1", "biography": "Bio 1", "books_count": 1, "created_at": "2024-01-01T00:00:00"},
+    {"id": 2, "name": "Mock Author 2", "biography": "Bio 2", "books_count": 1, "created_at": "2024-01-01T00:00:00"},
+]
+MOCK_CATEGORIES = [
+    {"id": 1, "name": "Mock Category 1", "description": "Desc 1", "books_count": 1, "created_at": "2024-01-01T00:00:00"},
+    {"id": 2, "name": "Mock Category 2", "description": "Desc 2", "books_count": 1, "created_at": "2024-01-01T00:00:00"},
+]
+MOCK_BOOKS = [
+    {
+        "id": 1,
+        "title": "Mock Book 1",
+        "author": MOCK_AUTHORS[0],
+        "category": MOCK_CATEGORIES[0],
+        "price": 10.99,
+        "stock": 5,
+        "description": "A mock book for testing.",
+        "isbn": "1234567890",
+        "publication_year": 2020,
+        "pages": 200,
+        "created_at": "2024-01-01T00:00:00",
+        "updated_at": "2024-01-01T00:00:00"
+    },
+    {
+        "id": 2,
+        "title": "Mock Book 2",
+        "author": MOCK_AUTHORS[1],
+        "category": MOCK_CATEGORIES[1],
+        "price": 15.99,
+        "stock": 0,
+        "description": "Another mock book.",
+        "isbn": "0987654321",
+        "publication_year": 2021,
+        "pages": 300,
+        "created_at": "2024-01-01T00:00:00",
+        "updated_at": "2024-01-01T00:00:00"
+    },
+]
+
 @app.get("/", tags=["Root"])
 def read_root():
     return {
-        "message": "Welcome to Book Store Service API",
+        "message": "Welcome to Book Store Service API (Mock)",
         "version": "1.0.0",
         "docs": "/docs",
         "redoc": "/redoc"
     }
 
-# Health check endpoint
 @app.get("/health", tags=["Health"])
 def health_check():
-    return {"status": "healthy", "service": "book-store-service"}
+    return {"status": "healthy", "service": "book-store-service-mock"}
 
-# Author endpoints
-@app.post("/authors/", response_model=schemas.AuthorResponse, tags=["Authors"])
-def create_author(author: schemas.AuthorCreate, db: Session = Depends(get_db)):
-    return crud.create_author(db=db, author=author)
+# Authors
+@app.get("/authors/", tags=["Authors"])
+def read_authors(skip: int = 0, limit: int = 100, search: Optional[str] = None):
+    items = MOCK_AUTHORS
+    if search:
+        items = [a for a in items if search.lower() in a["name"].lower()]
+    return {"items": items[skip:skip+limit], "total": len(items)}
 
-@app.get("/authors/", response_model=List[schemas.AuthorResponse], tags=["Authors"])
-def read_authors(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    authors = crud.get_authors(db, skip=skip, limit=limit)
-    return authors
+@app.get("/authors/{author_id}", tags=["Authors"])
+def read_author(author_id: int):
+    for author in MOCK_AUTHORS:
+        if author["id"] == author_id:
+            return author
+    raise HTTPException(status_code=404, detail="Author not found")
 
-@app.get("/authors/{author_id}", response_model=schemas.AuthorResponse, tags=["Authors"])
-def read_author(author_id: int, db: Session = Depends(get_db)):
-    db_author = crud.get_author(db, author_id=author_id)
-    if db_author is None:
-        raise HTTPException(status_code=404, detail="Author not found")
-    return db_author
+@app.post("/authors/", tags=["Authors"])
+def create_author(author: dict = Body(...)):
+    new_id = max([a["id"] for a in MOCK_AUTHORS], default=0) + 1
+    author["id"] = new_id
+    author["created_at"] = "2024-01-01T00:00:00"
+    MOCK_AUTHORS.append(author)
+    return author
 
-@app.put("/authors/{author_id}", response_model=schemas.AuthorResponse, tags=["Authors"])
-def update_author(author_id: int, author: schemas.AuthorUpdate, db: Session = Depends(get_db)):
-    db_author = crud.update_author(db, author_id=author_id, author=author)
-    if db_author is None:
-        raise HTTPException(status_code=404, detail="Author not found")
-    return db_author
+@app.put("/authors/{author_id}", tags=["Authors"])
+def update_author(author_id: int, author: dict = Body(...)):
+    for idx, a in enumerate(MOCK_AUTHORS):
+        if a["id"] == author_id:
+            author["id"] = author_id
+            author["updated_at"] = "2024-01-01T00:00:00"
+            MOCK_AUTHORS[idx] = author
+            return author
+    raise HTTPException(status_code=404, detail="Author not found")
 
 @app.delete("/authors/{author_id}", tags=["Authors"])
-def delete_author(author_id: int, db: Session = Depends(get_db)):
-    success = crud.delete_author(db, author_id=author_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Author not found")
-    return {"message": "Author deleted successfully"}
+def delete_author(author_id: int):
+    for idx, a in enumerate(MOCK_AUTHORS):
+        if a["id"] == author_id:
+            del MOCK_AUTHORS[idx]
+            return {"message": "Author deleted"}
+    raise HTTPException(status_code=404, detail="Author not found")
 
-# Category endpoints
-@app.post("/categories/", response_model=schemas.CategoryResponse, tags=["Categories"])
-def create_category(category: schemas.CategoryCreate, db: Session = Depends(get_db)):
-    return crud.create_category(db=db, category=category)
+# Categories
+@app.get("/categories/", tags=["Categories"])
+def read_categories(skip: int = 0, limit: int = 100, search: Optional[str] = None):
+    items = MOCK_CATEGORIES
+    if search:
+        items = [c for c in items if search.lower() in c["name"].lower()]
+    return {"items": items[skip:skip+limit], "total": len(items)}
 
-@app.get("/categories/", response_model=List[schemas.CategoryResponse], tags=["Categories"])
-def read_categories(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    categories = crud.get_categories(db, skip=skip, limit=limit)
-    return categories
+@app.get("/categories/{category_id}", tags=["Categories"])
+def read_category(category_id: int):
+    for category in MOCK_CATEGORIES:
+        if category["id"] == category_id:
+            return category
+    raise HTTPException(status_code=404, detail="Category not found")
 
-@app.get("/categories/{category_id}", response_model=schemas.CategoryResponse, tags=["Categories"])
-def read_category(category_id: int, db: Session = Depends(get_db)):
-    db_category = crud.get_category(db, category_id=category_id)
-    if db_category is None:
-        raise HTTPException(status_code=404, detail="Category not found")
-    return db_category
+@app.post("/categories/", tags=["Categories"])
+def create_category(category: dict = Body(...)):
+    new_id = max([c["id"] for c in MOCK_CATEGORIES], default=0) + 1
+    category["id"] = new_id
+    category["created_at"] = "2024-01-01T00:00:00"
+    MOCK_CATEGORIES.append(category)
+    return category
 
-@app.put("/categories/{category_id}", response_model=schemas.CategoryResponse, tags=["Categories"])
-def update_category(category_id: int, category: schemas.CategoryUpdate, db: Session = Depends(get_db)):
-    db_category = crud.update_category(db, category_id=category_id, category=category)
-    if db_category is None:
-        raise HTTPException(status_code=404, detail="Category not found")
-    return db_category
+@app.put("/categories/{category_id}", tags=["Categories"])
+def update_category(category_id: int, category: dict = Body(...)):
+    for idx, c in enumerate(MOCK_CATEGORIES):
+        if c["id"] == category_id:
+            category["id"] = category_id
+            category["updated_at"] = "2024-01-01T00:00:00"
+            MOCK_CATEGORIES[idx] = category
+            return category
+    raise HTTPException(status_code=404, detail="Category not found")
 
 @app.delete("/categories/{category_id}", tags=["Categories"])
-def delete_category(category_id: int, db: Session = Depends(get_db)):
-    success = crud.delete_category(db, category_id=category_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Category not found")
-    return {"message": "Category deleted successfully"}
+def delete_category(category_id: int):
+    for idx, c in enumerate(MOCK_CATEGORIES):
+        if c["id"] == category_id:
+            del MOCK_CATEGORIES[idx]
+            return {"message": "Category deleted"}
+    raise HTTPException(status_code=404, detail="Category not found")
 
-# Book endpoints
-@app.post("/books/", response_model=schemas.BookResponse, tags=["Books"])
-def create_book(book: schemas.BookCreate, db: Session = Depends(get_db)):
-    return crud.create_book(db=db, book=book)
-
-@app.get("/books/", response_model=schemas.PaginatedResponse, tags=["Books"])
-def read_books(
-    page: int = Query(1, ge=1, description="Page number"),
-    size: int = Query(10, ge=1, le=100, description="Items per page"),
-    title: Optional[str] = Query(None, description="Filter by book title"),
-    author_name: Optional[str] = Query(None, description="Filter by author name"),
-    category_name: Optional[str] = Query(None, description="Filter by category name"),
-    min_price: Optional[float] = Query(None, ge=0, description="Minimum price"),
-    max_price: Optional[float] = Query(None, ge=0, description="Maximum price"),
-    in_stock: Optional[bool] = Query(None, description="Filter by stock availability"),
-    db: Session = Depends(get_db)
-):
-    skip = (page - 1) * size
-    
-    # Create search object
-    search = schemas.BookSearch(
-        title=title,
-        author_name=author_name,
-        category_name=category_name,
-        min_price=min_price,
-        max_price=max_price,
-        in_stock=in_stock
-    )
-    
-    books = crud.get_books(db, skip=skip, limit=size, search=search)
-    total = crud.get_books_count(db, search=search)
+# Books
+@app.get("/books/", tags=["Books"])
+def read_books(page: int = Query(1, ge=1), size: int = Query(10, ge=1, le=100), search: Optional[str] = None):
+    items = MOCK_BOOKS
+    if search:
+        items = [b for b in items if search.lower() in b["title"].lower()]
+    total = len(items)
     pages = math.ceil(total / size)
-    
-    return schemas.PaginatedResponse(
-        items=books,
-        total=total,
-        page=page,
-        size=size,
-        pages=pages
-    )
+    skip = (page - 1) * size
+    return {
+        "items": items[skip:skip+size],
+        "total": total,
+        "page": page,
+        "size": size,
+        "pages": pages
+    }
 
-@app.get("/books/{book_id}", response_model=schemas.BookResponse, tags=["Books"])
-def read_book(book_id: int, db: Session = Depends(get_db)):
-    db_book = crud.get_book(db, book_id=book_id)
-    if db_book is None:
-        raise HTTPException(status_code=404, detail="Book not found")
-    return db_book
+@app.get("/books/{book_id}", tags=["Books"])
+def read_book(book_id: int):
+    for book in MOCK_BOOKS:
+        if book["id"] == book_id:
+            return book
+    raise HTTPException(status_code=404, detail="Book not found")
 
-@app.put("/books/{book_id}", response_model=schemas.BookResponse, tags=["Books"])
-def update_book(book_id: int, book: schemas.BookUpdate, db: Session = Depends(get_db)):
-    db_book = crud.update_book(db, book_id=book_id, book=book)
-    if db_book is None:
-        raise HTTPException(status_code=404, detail="Book not found")
-    return db_book
+@app.post("/books/", tags=["Books"])
+def create_book(book: dict = Body(...)):
+    new_id = max([b["id"] for b in MOCK_BOOKS], default=0) + 1
+    book["id"] = new_id
+    # Attach author and category objects if ids are provided
+    author_id = book.get("author_id")
+    category_id = book.get("category_id")
+    book["author"] = next((a for a in MOCK_AUTHORS if a["id"] == author_id), None)
+    book["category"] = next((c for c in MOCK_CATEGORIES if c["id"] == category_id), None)
+    book["created_at"] = "2024-01-01T00:00:00"
+    book["updated_at"] = "2024-01-01T00:00:00"
+    MOCK_BOOKS.append(book)
+    return book
+
+@app.put("/books/{book_id}", tags=["Books"])
+def update_book(book_id: int, book: dict = Body(...)):
+    for idx, b in enumerate(MOCK_BOOKS):
+        if b["id"] == book_id:
+            book["id"] = book_id
+            author_id = book.get("author_id")
+            category_id = book.get("category_id")
+            book["author"] = next((a for a in MOCK_AUTHORS if a["id"] == author_id), None)
+            book["category"] = next((c for c in MOCK_CATEGORIES if c["id"] == category_id), None)
+            book["updated_at"] = "2024-01-01T00:00:00"
+            MOCK_BOOKS[idx] = book
+            return book
+    raise HTTPException(status_code=404, detail="Book not found")
 
 @app.delete("/books/{book_id}", tags=["Books"])
-def delete_book(book_id: int, db: Session = Depends(get_db)):
-    success = crud.delete_book(db, book_id=book_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Book not found")
-    return {"message": "Book deleted successfully"}
+def delete_book(book_id: int):
+    for idx, b in enumerate(MOCK_BOOKS):
+        if b["id"] == book_id:
+            del MOCK_BOOKS[idx]
+            return {"message": "Book deleted"}
+    raise HTTPException(status_code=404, detail="Book not found")
 
-@app.patch("/books/{book_id}/stock", response_model=schemas.BookResponse, tags=["Books"])
-def update_book_stock(
-    book_id: int, 
-    quantity_change: int = Query(..., description="Change in stock quantity (positive for addition, negative for reduction)"),
-    db: Session = Depends(get_db)
-):
-    db_book = crud.update_book_stock(db, book_id=book_id, quantity_change=quantity_change)
-    if db_book is None:
-        raise HTTPException(status_code=404, detail="Book not found")
-    return db_book
-
-# Search endpoint
-@app.get("/search/books/", response_model=List[schemas.BookResponse], tags=["Search"])
-def search_books(
-    q: str = Query(..., description="Search query for book title, author, or description"),
-    db: Session = Depends(get_db)
-):
-    # This is a simple search implementation
-    # In a production environment, you might want to use full-text search
-    books = crud.get_books(db, search=schemas.BookSearch(title=q))
-    return books
+# Search
+@app.get("/search/books/", tags=["Search"])
+def search_books(q: str = Query(...)):
+    items = [b for b in MOCK_BOOKS if q.lower() in b["title"].lower() or q.lower() in b["description"].lower()]
+    return items
 
 if __name__ == "__main__":
     import uvicorn

@@ -120,7 +120,9 @@ def get_books(
             else:
                 query = query.filter(models.Book.stock_quantity == 0)
     
-    return query.offset(skip).limit(limit).all()
+    # Filter out books with missing authors to prevent validation errors
+    books = query.filter(models.Book.author_id.isnot(None)).offset(skip).limit(limit).all()
+    return books
 
 def get_books_count(db: Session, search: Optional[schemas.BookSearch] = None) -> int:
     query = db.query(models.Book)
@@ -144,7 +146,8 @@ def get_books_count(db: Session, search: Optional[schemas.BookSearch] = None) ->
             else:
                 query = query.filter(models.Book.stock_quantity == 0)
     
-    return query.count()
+    # Count only books with valid authors
+    return query.filter(models.Book.author_id.isnot(None)).count()
 
 def update_book(db: Session, book_id: int, book: schemas.BookUpdate) -> Optional[models.Book]:
     db_book = get_book(db, book_id)
