@@ -184,12 +184,61 @@ python run.py
 docker-compose up --build
 ```
 
+### GitHub Pages Deployment
+
+#### Prerequisites
+1. **Backend API**: Deploy the FastAPI backend to a hosting service (Render, Railway, Heroku, etc.)
+2. **Environment Variables**: Set up the backend URL as a GitHub secret
+
+#### Steps to Deploy
+
+1. **Deploy Backend API** (choose one):
+   - **Render**: Connect your GitHub repo and deploy the backend
+   - **Railway**: Push your code and deploy
+   - **Heroku**: Use Heroku CLI or GitHub integration
+
+2. **Set GitHub Secrets**:
+   - Go to your repository → Settings → Secrets and variables → Actions
+   - Add `REACT_APP_API_URL` with your deployed backend URL (e.g., `https://your-app.onrender.com`)
+
+3. **Enable GitHub Pages**:
+   - Go to repository Settings → Pages
+   - Source: Deploy from a branch
+   - Branch: `gh-pages` (will be created automatically)
+   - Folder: `/ (root)`
+
+4. **Deploy Frontend**:
+   ```bash
+   cd frontend
+   npm install
+   npm run deploy
+   ```
+
+#### Manual Deployment
+```bash
+# Install dependencies
+cd frontend
+npm install
+
+# Build for production
+npm run build
+
+# Deploy to GitHub Pages
+npm run deploy
+```
+
 ### Production Deployment
 1. Set up a production database (PostgreSQL recommended)
 2. Configure environment variables
 3. Use a production WSGI server like Gunicorn
 4. Set up reverse proxy (Nginx)
 5. Configure SSL certificates
+
+## 🌐 Live Demo
+
+- **Frontend**: [https://gouravjain.github.io/book_store_service_python_fastapi_sql](https://gouravjain.github.io/book_store_service_python_fastapi_sql)
+- **Backend API**: [Your deployed backend URL]
+- **API Documentation**: [Your deployed backend URL]/docs
 
 ## 📚 Documentation
 
@@ -252,3 +301,98 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0.23-red.svg)](https://www.sqlalchemy.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) 
+
+---
+
+# 🖥️ Frontend: React Book Store UI
+
+A modern, mobile-friendly React application for managing and browsing books, authors, and categories, designed to work seamlessly with the Book Store Service API.
+
+## 🌟 Features
+- **Dashboard**: Overview of books, authors, and categories with quick actions
+- **Books Management**: List, search, create, view, and delete books
+- **Authors Management**: List, search, create, view, and delete authors
+- **Categories Management**: List, search, create, view, and delete categories
+- **Responsive UI**: Mobile-first, works on all devices
+- **API Integration**: Connects to the FastAPI backend
+- **Modern UI/UX**: Built with Tailwind CSS, React Router, and Headless UI
+- **State Management**: Uses React Query for data fetching and caching
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v16+ recommended)
+- npm (v8+ recommended)
+
+### Installation
+
+1. **Navigate to the frontend directory:**
+   ```bash
+   cd frontend
+   ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+3. **Start the development server:**
+   ```bash
+   npm start
+   ```
+   The app will run at [http://localhost:3000](http://localhost:3000) (or another port if 3000 is in use).
+
+### Building for Production
+```bash
+npm run build
+```
+The production build will be in the `frontend/build` directory.
+
+## 🗂️ Project Structure (Frontend)
+```
+frontend/
+├── public/                # Static assets
+├── src/
+│   ├── api/               # Axios API client
+│   ├── components/        # Shared UI components (Header, Sidebar)
+│   ├── hooks/             # React Query hooks for API
+│   ├── pages/             # Main pages (Dashboard, Books, Authors, Categories, Create/Edit forms)
+│   ├── App.js             # Main app and routing
+│   ├── index.js           # Entry point
+│   └── index.css          # Tailwind CSS
+├── package.json           # Project metadata and scripts
+└── ...
+```
+
+## 🧭 Main Pages & Navigation
+- **Dashboard**: Overview stats and quick actions
+- **Books**: List, search, create, view, and delete books
+- **Authors**: List, search, create, view, and delete authors
+- **Categories**: List, search, create, view, and delete categories
+- **Create/Edit Forms**: For books, authors, and categories
+
+## 🔗 API Connection
+- The frontend expects the backend API to be running at `http://localhost:8000` (configurable via environment variables)
+- All CRUD operations are performed via REST API calls
+
+## 🛠️ Technologies Used
+- **React 18**
+- **React Router 6**
+- **React Query**
+- **Axios**
+- **Tailwind CSS**
+- **Headless UI & Heroicons**
+- **Framer Motion** (for animation)
+
+## 🧪 Testing
+- Run `npm test` to launch the test runner (Jest + React Testing Library)
+
+## 💡 Tips
+- The UI is fully responsive and works on mobile, tablet, and desktop
+- You can customize the theme via Tailwind config
+- For API errors, user-friendly toasts are shown
+
+## 🤝 Contributing (Frontend)
+- Fork the repo, create a branch, and submit a PR for UI improvements or bug fixes
+
+---
+
+**Built with ❤️ using React and Tailwind CSS**

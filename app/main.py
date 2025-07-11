@@ -13,7 +13,13 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "*",  # For development - restrict this in production
+        "https://gouravjain.github.io",
+        "https://*.github.io",
+        "http://localhost:3000",
+        "http://localhost:8001"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

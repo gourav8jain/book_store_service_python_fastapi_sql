@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useCategories } from '../hooks/useApi';
+import { useCategories, useDeleteCategory } from '../hooks/useApi';
 import { PlusIcon, MagnifyingGlassIcon, TagIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
@@ -19,6 +19,8 @@ const Categories = () => {
   const totalCategories = categoriesData?.total || 0;
   const totalPages = Math.ceil(totalCategories / itemsPerPage);
 
+  const deleteCategoryMutation = useDeleteCategory();
+
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
@@ -28,11 +30,10 @@ const Categories = () => {
   const handleDelete = async (categoryId) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
-        // TODO: Implement delete functionality
-        toast.success('Category deleted successfully');
+        await deleteCategoryMutation.mutateAsync(categoryId);
         refetch();
       } catch (error) {
-        toast.error('Failed to delete category');
+        // Error handled by mutation hook
       }
     }
   };

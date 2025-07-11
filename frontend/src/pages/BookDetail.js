@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useBook } from '../hooks/useApi';
+import { useBook, useDeleteBook } from '../hooks/useApi';
 import { ArrowLeftIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
@@ -8,15 +8,15 @@ const BookDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: book, isLoading, error, refetch } = useBook(id);
+  const deleteBookMutation = useDeleteBook();
 
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this book?')) {
       try {
-        // TODO: Implement delete functionality
-        toast.success('Book deleted successfully');
+        await deleteBookMutation.mutateAsync(id);
         navigate('/books');
       } catch (error) {
-        toast.error('Failed to delete book');
+        // Error handled by mutation hook
       }
     }
   };

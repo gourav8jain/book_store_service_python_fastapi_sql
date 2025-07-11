@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useAuthor } from '../hooks/useApi';
+import { useAuthor, useDeleteAuthor } from '../hooks/useApi';
 import { ArrowLeftIcon, PencilIcon, TrashIcon, BookOpenIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
@@ -8,15 +8,15 @@ const AuthorDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: author, isLoading, error, refetch } = useAuthor(id);
+  const deleteAuthorMutation = useDeleteAuthor();
 
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this author?')) {
       try {
-        // TODO: Implement delete functionality
-        toast.success('Author deleted successfully');
+        await deleteAuthorMutation.mutateAsync(id);
         navigate('/authors');
       } catch (error) {
-        toast.error('Failed to delete author');
+        // Error handled by mutation hook
       }
     }
   };

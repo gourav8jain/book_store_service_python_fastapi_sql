@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useBooks } from '../hooks/useApi';
+import { useBooks, useDeleteBook } from '../hooks/useApi';
 import { PlusIcon, MagnifyingGlassIcon, BookOpenIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
@@ -15,6 +15,8 @@ const Books = () => {
     limit: itemsPerPage
   });
 
+  const deleteBookMutation = useDeleteBook();
+
   const books = booksData?.items || [];
   const totalBooks = booksData?.total || 0;
   const totalPages = Math.ceil(totalBooks / itemsPerPage);
@@ -28,11 +30,10 @@ const Books = () => {
   const handleDelete = async (bookId) => {
     if (window.confirm('Are you sure you want to delete this book?')) {
       try {
-        // TODO: Implement delete functionality
-        toast.success('Book deleted successfully');
+        await deleteBookMutation.mutateAsync(bookId);
         refetch();
       } catch (error) {
-        toast.error('Failed to delete book');
+        // Error handled by mutation hook
       }
     }
   };

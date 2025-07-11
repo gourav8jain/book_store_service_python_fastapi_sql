@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuthors } from '../hooks/useApi';
+import { useAuthors, useDeleteAuthor } from '../hooks/useApi';
 import { PlusIcon, MagnifyingGlassIcon, UserGroupIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
@@ -19,6 +19,8 @@ const Authors = () => {
   const totalAuthors = authorsData?.total || 0;
   const totalPages = Math.ceil(totalAuthors / itemsPerPage);
 
+  const deleteAuthorMutation = useDeleteAuthor();
+
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
@@ -28,11 +30,10 @@ const Authors = () => {
   const handleDelete = async (authorId) => {
     if (window.confirm('Are you sure you want to delete this author?')) {
       try {
-        // TODO: Implement delete functionality
-        toast.success('Author deleted successfully');
+        await deleteAuthorMutation.mutateAsync(authorId);
         refetch();
       } catch (error) {
-        toast.error('Failed to delete author');
+        // Error handled by mutation hook
       }
     }
   };

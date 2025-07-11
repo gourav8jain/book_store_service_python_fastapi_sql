@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useCategory } from '../hooks/useApi';
+import { useCategory, useDeleteCategory } from '../hooks/useApi';
 import { ArrowLeftIcon, PencilIcon, TrashIcon, BookOpenIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
@@ -8,15 +8,15 @@ const CategoryDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { data: category, isLoading, error, refetch } = useCategory(id);
+  const deleteCategoryMutation = useDeleteCategory();
 
   const handleDelete = async () => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
-        // TODO: Implement delete functionality
-        toast.success('Category deleted successfully');
+        await deleteCategoryMutation.mutateAsync(id);
         navigate('/categories');
       } catch (error) {
-        toast.error('Failed to delete category');
+        // Error handled by mutation hook
       }
     }
   };
